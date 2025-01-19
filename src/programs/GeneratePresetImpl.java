@@ -6,15 +6,14 @@ import com.battle.heroes.army.programs.GeneratePreset;
 
 import java.util.*;
 
-// Сортировка списка unitList имеет временную сложность O(n * log(n)), где n -количество юнитов в списке.
-
+// Сортировка списка unitList имеет временную сложность O(n * log(n)), где n - количество юнитов в списке.
 
 // Итерация по listOfUnits:
-// Внешний цикл выполняется n раз (где n - количество элементов в listOfUnits).
+// Внешний цикл выполняется n раз.
 // Внутренний цикл выполняется не более 11 раз для каждой единицы (константное количество итераций).
 // Итоговая сложность данной части - O(n), так как внутренний цикл ограничен константой.
 
-// Итоговая сложность алгоритма - O(n * logn), где n - количество единиц в listOfUnits
+// Итоговая сложность алгоритма - O(n * log(n)), где n - количество единиц в listOfUnits
 public class GeneratePresetImpl implements GeneratePreset {
 
     private static final int START_FIELD_WIDTH = 3;
