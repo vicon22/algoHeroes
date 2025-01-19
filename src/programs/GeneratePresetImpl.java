@@ -19,6 +19,10 @@ public class GeneratePresetImpl implements GeneratePreset {
     private static final int START_FIELD_WIDTH = 3;
     private static final int START_FIELD_LENGTH = 21;
 
+    private static final Random random = new Random();
+
+    private Set<String> occupiedCoordinates;
+
     @Override
     public Army generate(List<Unit> unitList, int maxPoints) {
         System.out.println("Начало генерации");
@@ -27,43 +31,22 @@ public class GeneratePresetImpl implements GeneratePreset {
         int currentPoints = 0;
 
         // Множество занятых координат
-        Set<String> occupiedCoordinates = new HashSet<>();
+        occupiedCoordinates = new HashSet<>();
 
         // Сортируем юнитов по двум критериям эффективность атаки и здоровья к стоимости
         unitList.sort(Comparator.comparingDouble(
                 unit -> (unit.getBaseAttack() / (double) unit.getCost()
                         + unit.getHealth() / (double) unit.getCost())));
 
-        Random random = new Random();
-
         for (Unit unit : unitList) {
             int unitCount = 0;
 
             // Пока возможно добавляем юнитов
             while (unitCount < 11 && currentPoints + unit.getCost() <= maxPoints) {
-                // Генерация координаты
-                int x, y;
-                String coordinateKey;
-                do {
-                    x = random.nextInt(START_FIELD_WIDTH);
-                    y = random.nextInt(START_FIELD_LENGTH);
-                    coordinateKey = x + "_" + y;
-                } while (occupiedCoordinates.contains(coordinateKey));
 
+                int[] coordinates = getCoordinates();
 
-                occupiedCoordinates.add(coordinateKey);
-
-                Unit newUnit = new Unit(
-                        unit.getUnitType() + " " + unitCount,
-                        unit.getUnitType(),
-                        unit.getHealth(),
-                        unit.getBaseAttack(),
-                        unit.getCost(),
-                        unit.getAttackType(),
-                        new HashMap<>(unit.getAttackBonuses()),
-                        new HashMap<>(unit.getDefenceBonuses()),
-                        x,
-                        y);
+                Unit newUnit = createUnit(unit, unitCount, coordinates);
 
                 computerArmy.getUnits().forEach(unit1 -> System.out.println((unit1.getName() + " x:" + unit1.getxCoordinate() + " y:" +
                         unit1.getyCoordinate())));
@@ -78,4 +61,39 @@ public class GeneratePresetImpl implements GeneratePreset {
         System.out.println("Конец генерации");
         return computerArmy;
     }
+
+    // Генерация координаты
+    private int[] getCoordinates() {
+        int[] coordinates = new int[2];
+
+        int x, y;
+        String coordinateKey;
+        do {
+            x = random.nextInt(START_FIELD_WIDTH);
+            y = random.nextInt(START_FIELD_LENGTH);
+            coordinateKey = x + "_" + y;
+        } while (occupiedCoordinates.contains(coordinateKey));
+
+        occupiedCoordinates.add(coordinateKey);
+
+        coordinates[0] = x;
+        coordinates[1] = y;
+
+        return coordinates;
+    }
+
+    private Unit createUnit(Unit unit, int unitCount, int[] coordinates) {
+        return new Unit(
+                unit.getUnitType() + " " + unitCount,
+                unit.getUnitType(),
+                unit.getHealth(),
+                unit.getBaseAttack(),
+                unit.getCost(),
+                unit.getAttackType(),
+                new HashMap<>(unit.getAttackBonuses()),
+                new HashMap<>(unit.getDefenceBonuses()),
+                coordinates[0],
+                coordinates[1]);
+    }
+
 }
